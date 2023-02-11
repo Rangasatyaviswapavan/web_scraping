@@ -1,16 +1,19 @@
+import boto3
 import cloudscraper
 import csv
-import boto3
-import pandas as pd
+import pandas
+
 scraper = cloudscraper.create_scraper()
-page = scraper.get('https://finviz.com/screener.ashx?v=410&s=ta_topgainers').text
-res = pd.read_html(page)
+page = scraper.get('https://finviz.com/screener.ashx?v=410&s=ta_top Gainers').text
+res = pandas.read_html(page)
 lst = res[8][0][0].split()
-s3 = boto3.client('s3')
-bucket_name = 'scraperrresults'
-file_name = 'results.csv'
-fn = "GFG.csv"
+
+fn = "results.csv"
 with open(fn,'w') as f:
-  csvw =csv.writer(f)
-  csvw.writerow(lst)
-s3.upload_file(file_name, bucket_name, file_name)
+  csvw = csv.writer(f)
+  for item in lst:
+    csvw.writerow([item])
+
+# Upload the result to S3
+s3 = boto3.client('s3')
+s3.upload_file(fn, 'scraperrresults', fn)
